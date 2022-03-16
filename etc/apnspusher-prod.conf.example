@@ -1,0 +1,65 @@
+app {
+  bookmarks {
+    load "remove module lib/libsmpp.so";
+  } # opentest.bookmarks
+
+  prompt "apnspusher> ";
+
+  log {
+    level 7;
+  } # log
+
+  stompstats {
+    source "aprspusher";
+    instance "secundus";
+    interval 30;
+    hosts "10.0.1.3:61613";
+    login "apnspusher-stompstats-prod";
+    passcode "apnspusher-stompstats-prod";
+    destination "/topic/stats.prod";
+  } # stompstats
+
+  apns {
+    ssl {
+      cert "Certs/apn-prod-cert.pem";
+      key "Certs/apn-prod-key.pem";
+      capath "Certs";
+    } # app.apns.ssl
+
+    push 1 {
+      host "gateway.push.apple.com";
+      port 2195;
+      timeout 3600;
+    } # app.apns.push
+
+    feedback {
+      enable true;
+      host "gateway.push.apple.com";
+      port 2196;
+      interval 86400;
+    } # app.apns.feedback
+  } # app.apns
+
+  threads {
+    worker 1 {
+      sql {
+        host "localhost";
+        user "root";
+        pass "";
+        database "openaprs";
+      } # app.threads.worker.sql
+
+      stomp {
+        hosts "localhost:61613";
+        login "apnspusher-worker-prod";
+        passcode "apnspusher-worker-prod";
+        destination "/queue/feeds.aprs.*";
+      } # app.threads.worker.stomp
+    } # app.threads.worker
+  } # app.threads
+
+#  modules {
+#    load [ "lib/libmodstomp.so" ];
+#  } # modules
+
+} # app

@@ -1,0 +1,14 @@
+/home/omni/prod/apnspusher/logs/*.log {
+        daily
+        missingok
+        rotate 3
+        compress
+        delaycompress
+        notifempty
+        olddir /home/omni/prod/apnspusher/logs/old
+        create 640 omni omni
+        sharedscripts
+        postrotate
+          /bin/kill -HUP `cat /home/omni/prod/apnspusher/apnspusher.pid 2>/dev/null` 2>/dev/null || true
+        endscript
+}
